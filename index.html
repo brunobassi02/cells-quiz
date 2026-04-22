@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CellMastery Pro: 8th Grade Biology</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(400%); }
+        }
+        .animate-loading { animation: loading 1.5s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+    <!-- App Root -->
+    <div id="app">
+        <!-- Auth Screen (Default) -->
+        <div id="screen-auth" class="flex flex-col items-center text-center py-24 px-4">
+            <div class="w-24 h-24 bg-emerald-600 rounded-[2rem] rotate-12 flex items-center justify-center mb-8 shadow-2xl shadow-emerald-200">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white -rotate-12"><path d="M12 5V3m0 18v-2M5 12H3m18 0h-2M7 7 5.5 5.5m13 13L17 17m0-10 1.5-1.5M5.5 18.5 7 17m5-5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm7 7a7 7 0 0 0-14 0h14Z"/></svg>
+            </div>
+            <h1 class="text-6xl font-black tracking-tighter mb-4 italic">CellMastery Pro</h1>
+            <p class="text-slate-500 text-lg mb-12 max-w-md font-medium">The definitive 8th-grade guide to Animal, Plant, and Bacterial cell structures.</p>
+            <button id="login-btn" class="flex items-center gap-4 bg-white border-b-4 border-slate-200 px-10 py-5 rounded-2xl font-black text-slate-700 hover:border-emerald-600 hover:text-emerald-700 transition-all shadow-lg active:translate-y-1 active:border-b-0">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" class="w-6 h-6" alt="google">
+                Sign in with Google
+            </button>
+        </div>
+
+        <!-- Main Menu -->
+        <div id="screen-menu" class="hidden max-w-4xl mx-auto pt-24 px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <button onclick="quizEngine.start()" class="group flex flex-col items-center justify-center p-14 bg-white rounded-[2.5rem] border-2 border-slate-100 hover:border-emerald-500 transition-all shadow-sm hover:shadow-2xl hover:shadow-emerald-100 hover:-translate-y-1">
+                    <div class="w-20 h-20 bg-emerald-100 rounded-3xl flex items-center justify-center mb-6 transition-all group-hover:bg-emerald-500 group-hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="group-hover:fill-white"><path d="M7 6v12l10-6z"/></svg>
+                    </div>
+                    <h3 class="text-3xl font-black mb-2">Launch Lab</h3>
+                    <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">36 Organelle Scans</p>
+                </button>
+                <button onclick="leaderboardEngine.load()" class="group flex flex-col items-center justify-center p-14 bg-white rounded-[2.5rem] border-2 border-slate-100 hover:border-blue-500 transition-all shadow-sm hover:shadow-2xl hover:shadow-blue-100 hover:-translate-y-1">
+                    <div class="w-20 h-20 bg-blue-100 rounded-3xl flex items-center justify-center mb-6 transition-all group-hover:bg-blue-500 group-hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6m12 5h1.5a2.5 2.5 0 0 0 0-5H18M9 22h6m-3-15V2m0 12a5 5 0 0 0 5-5H7a5 5 0 0 0 5 5Z"/></svg>
+                    </div>
+                    <h3 class="text-3xl font-black mb-2">Class Hall</h3>
+                    <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">View Rankings</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="screen-quiz" class="hidden max-w-4xl mx-auto pt-24 px-4 pb-12">
+            <div class="flex items-center justify-between px-2 mb-6">
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-1">Target Specimen</span>
+                    <div id="quiz-cat" class="px-4 py-1.5 bg-slate-900 rounded-lg text-[11px] font-black uppercase tracking-widest text-emerald-400 shadow-lg">ANIMAL_CELL.v8</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-[10px] uppercase font-black text-slate-400 tracking-[0.2em] mb-1">Session Progress</div>
+                    <div class="text-2xl font-black text-slate-900 tabular-nums"><span id="quiz-idx">1</span> <span class="text-slate-200">/</span> 36</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-[3rem] p-10 shadow-2xl shadow-slate-200 border border-slate-100 relative">
+                <div class="aspect-[2.2/1] w-full bg-slate-50 rounded-[2rem] overflow-hidden mb-10 flex items-center justify-center border-2 border-dashed border-slate-200 relative p-6">
+                    <img id="quiz-img" src="" class="max-h-full max-w-full object-contain filter drop-shadow-xl" alt="cell structure">
+                </div>
+                <h2 id="quiz-q" class="text-3xl font-black text-slate-900 mb-10 leading-[1.3] italic underline decoration-emerald-500/20 underline-offset-8">Wait for scan...</h2>
+                <div id="quiz-options" class="grid grid-cols-1 gap-4"></div>
+                <div id="quiz-feedback" class="hidden mt-10 space-y-5">
+                    <div id="feedback-box" class="p-8 rounded-[2rem] border-2">
+                        <p id="feedback-text" class="font-bold text-lg leading-relaxed"></p>
+                    </div>
+                    <button onclick="quizEngine.next()" class="w-full py-6 bg-slate-900 text-white rounded-[1.5rem] font-black text-xl hover:bg-black transition-all flex items-center justify-center gap-4 active:scale-95 shadow-2xl">
+                        Next Discovery
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Screen -->
+        <div id="screen-leaderboard" class="hidden max-w-4xl mx-auto pt-24 px-4 pb-12">
+            <div class="flex items-center justify-between bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 mb-8">
+                <div>
+                    <h2 class="text-4xl font-black tracking-tighter italic text-slate-900 mb-1">Hall of Fame</h2>
+                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest leading-none">Class Records</p>
+                </div>
+                <button onclick="ui.showScreen('menu')" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest">Back</button>
+            </div>
+            <div class="bg-white rounded-[3rem] overflow-hidden shadow-2xl border border-slate-100">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-slate-900 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                            <th class="px-8 py-5">Researcher</th>
+                            <th class="px-8 py-5 text-center">ANML</th>
+                            <th class="px-8 py-5 text-center">PLNT</th>
+                            <th class="px-8 py-5 text-center">BCTR</th>
+                            <th class="px-8 py-5 text-right">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="screen-results" class="hidden max-w-2xl mx-auto pt-24 px-4 py-12 text-center">
+            <div class="bg-white rounded-[4rem] p-16 shadow-2xl border-8 border-emerald-50">
+                <div class="w-24 h-24 bg-emerald-500 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl rotate-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </div>
+                <h2 class="text-5xl font-black mb-4 italic text-slate-900">Lab Analysis Complete</h2>
+                <div class="grid grid-cols-3 gap-6 mb-12">
+                    <div class="bg-slate-50 p-6 rounded-3xl">
+                        <span class="text-[10px] font-black uppercase text-slate-400 mb-1 block">Animal</span>
+                        <span id="res-anml" class="text-2xl font-black">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-3xl">
+                        <span class="text-[10px] font-black uppercase text-slate-400 mb-1 block">Plant</span>
+                        <span id="res-plnt" class="text-2xl font-black">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-3xl">
+                        <span class="text-[10px] font-black uppercase text-slate-400 mb-1 block">Bacteria</span>
+                        <span id="res-bctr" class="text-2xl font-black">0</span>
+                    </div>
+                </div>
+                <div class="text-8xl font-black text-emerald-600 mb-12"><span id="res-total">0</span> <span class="text-slate-200 text-2xl italic">EXP</span></div>
+                <button onclick="ui.showScreen('menu')" class="w-full py-6 bg-emerald-600 text-white rounded-2xl font-black text-2xl hover:bg-emerald-700 shadow-xl shadow-emerald-100">Return to Hub</button>
+            </div>
+        </div>
+
+        <!-- User HUD (Floating) -->
+        <div id="user-hud" class="hidden fixed top-0 left-0 right-0 h-16 glass border-b border-slate-200 z-50 px-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img id="user-photo" src="" class="w-10 h-10 rounded-full border border-emerald-200" alt="avatar">
+                <div class="flex flex-col">
+                    <span id="user-name" class="text-sm font-bold text-emerald-900">Student</span>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest font-black opacity-60">Active Researcher</span>
+                </div>
+            </div>
+            <button onclick="authManager.logout()" class="p-2 hover:bg-red-50 rounded-full text-slate-400 hover:text-red-500 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14 5-5-5-5m5 5H9"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, getDocs, collection, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // --- PASTE YOUR FIREBASE CONFIG HERE ---
+        const firebaseConfig = {
+  apiKey: "AIzaSyBvZ6_dc2gjb8WNxr-ai0esdnAl7-72tp4",
+  authDomain: "biology-cells-class.firebaseapp.com",
+  projectId: "biology-cells-class",
+  storageBucket: "biology-cells-class.firebasestorage.app",
+  messagingSenderId: "926129435615",
+  appId: "1:926129435615:web:a056d9de5fa528043fca6a",
+  measurementId: "G-5EX7ZKZYDN"
+};
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- Questions Data ---
+        const QUESTION_BANK = [
+            // --- ANIMAL CELLS (12) ---
+            { id: 'a1', cat: 'Animal', q: "This organelle acts as the control center of the animal cell. What is it?", o: ["Mitochondria", "Nucleus", "Vacuole", "Ribosome"], a: 1, f: "The nucleus contains DNA and directs all cell activities.", img: "https://via.placeholder.com/400x200?text=Animal+Nucleus" },
+            { id: 'a2', cat: 'Animal', q: "Which 'powerhouse' organelle converts nutrients into energy (ATP)?", o: ["Lysosome", "Golgi Apparatus", "Mitochondria", "ER"], a: 2, f: "Mitochondria are responsible for cellular respiration.", img: "https://via.placeholder.com/400x200?text=Mitochondria" },
+            { id: 'a3', cat: 'Animal', q: "This thin, flexible outer layer controls what enters and exits the cell.", o: ["Cell Wall", "Cell Membrane", "Cytoplasm", "Capsule"], a: 1, f: "The Cell Membrane is selectively permeable.", img: "https://via.placeholder.com/400x200?text=Membrane" },
+            { id: 'a4', cat: 'Animal', q: "What is the jelly-like substance that fills the cell and surrounds organelles?", o: ["Cytoskeleton", "Nuclear Sap", "Cytoplasm", "Vesicle"], a: 2, f: "Cytoplasm provides a platform for organelles.", img: "https://via.placeholder.com/400x200?text=Cytoplasm" },
+            { id: 'a5', cat: 'Animal', q: "Which organelle is covered in ribosomes and helps transport proteins?", o: ["Smooth ER", "Rough ER", "Golgi Body", "Lysosome"], a: 1, f: "Rough ER is 'rough' because of ribosomes.", img: "https://via.placeholder.com/400x200?text=Rough+ER" },
+            { id: 'a6', cat: 'Animal', q: "This organelle modifies, sorts, and packages proteins for secretion.", o: ["Vesicle", "Ribosome", "Golgi Apparatus", "Nucleus"], a: 2, f: "Golgi is like the cell's post office.", img: "https://via.placeholder.com/400x200?text=Golgi" },
+            { id: 'a7', cat: 'Animal', q: "What are the small structures responsible for making proteins?", o: ["Ribosomes", "Vacuoles", "Mitochondria", "Centrioles"], a: 0, f: "Ribosomes translate genetic code into proteins.", img: "https://via.placeholder.com/400x200?text=Ribosome" },
+            { id: 'a8', cat: 'Animal', q: "Which small sac-like structure transports materials throughout the cell?", o: ["Large Vacuole", "Vesicle", "Nucleus", "Cytoplasm"], a: 1, f: "Vesicles move substances around or out.", img: "https://via.placeholder.com/400x200?text=Vesicle" },
+            { id: 'a9', cat: 'Animal', q: "This network of protein fibers helps the cell maintain its shape.", o: ["Cell Wall", "Cytoskeleton", "Flagella", "Smooth ER"], a: 1, f: "The cytoskeleton provides structural support.", img: "https://via.placeholder.com/400x200?text=Cytoskeleton" },
+            { id: 'a10', cat: 'Animal', q: "Animal cells have small, temporary versions of these storage sacs.", o: ["Chloroplasts", "Vacuoles", "Ribosomes", "Mitochondria"], a: 1, f: "Animal vacuoles are small and many.", img: "https://via.placeholder.com/400x200?text=Vacuole" },
+            { id: 'a11', cat: 'Animal', q: "This organelle produces lipids and detoxifies chemicals (lacks ribosomes).", o: ["Rough ER", "Smooth ER", "Golgi body", "Nucleus"], a: 1, f: "Smooth ER creates steroids and lipids.", img: "https://via.placeholder.com/400x200?text=Smooth+ER" },
+            { id: 'a12', cat: 'Animal', q: "What is the function of the nucleolus found inside the nucleus?", o: ["Store DNA", "Produce Energy", "Make Ribosomes", "Control Entry"], a: 2, f: "The nucleolus assembles ribosome subunits.", img: "https://via.placeholder.com/400x200?text=Nucleolus" },
+
+            // --- PLANT CELLS (12) ---
+            { id: 'p1', cat: 'Plant', q: "Which stiff, outer layer provides extra support for plant cells?", o: ["Cell Membrane", "Cell Wall", "Capsule", "Cytoskeleton"], a: 1, f: "The Cell Wall is made of cellulose.", img: "https://via.placeholder.com/400x200?text=Cell+Wall" },
+            { id: 'p2', cat: 'Plant', q: "This green organelle is where photosynthesis happens.", o: ["Mitochondria", "Chloroplast", "Chromoplast", "Leucoplast"], a: 1, f: "Chloroplasts contain chlorophyll for energy capture.", img: "https://via.placeholder.com/400x200?text=Chloroplast" },
+            { id: 'p3', cat: 'Plant', q: "What is the huge sac that stores water and nutrients in plants?", o: ["Small Vacuole", "Vesicle", "Central Vacuole", "Cytoplasm"], a: 2, f: "The Central Vacuole maintains turgor pressure.", img: "https://via.placeholder.com/400x200?text=Central+Vacuole" },
+            { id: 'p4', cat: 'Plant', q: "Plant cells have both a cell wall AND a cell membrane. True or False?", o: ["True", "False"], a: 0, f: "Plants need both for control and structure.", img: "https://via.placeholder.com/400x200?text=Plant+Layers" },
+            { id: 'p5', cat: 'Plant', q: "Which organelle provides the plant with energy via respiration?", o: ["Chloroplast", "Mitochondria", "Nucleus", "Ribosome"], a: 1, f: "Plants use BOTH chloroplasts and mitochondria.", img: "https://via.placeholder.com/400x200?text=Plant+Mitochondria" },
+            { id: 'p6', cat: 'Plant', q: "Structure that contains the plant's hereditary info?", o: ["Chloroplast", "Vacuole", "Nucleus", "Cell Wall"], a: 2, f: "Nucleus holds DNA in all eukaryotes.", img: "https://via.placeholder.com/400x200?text=Plant+DNA" },
+            { id: 'p7', cat: 'Plant', q: "What gives plant cells their typically rectangular shape?", o: ["Cell Membrane", "Cytoplasm", "Cell Wall", "Vacuole"], a: 2, f: "Rigid cell wall defines the shape.", img: "https://via.placeholder.com/400x200?text=Box+Shape" },
+            { id: 'p8', cat: 'Plant', q: "In which category does the chloroplast belong?", o: ["Mitochondria", "Plastids", "Ribosomes", "Vesicles"], a: 1, f: "Chloroplasts are a type of plastid.", img: "https://via.placeholder.com/400x200?text=Plastid" },
+            { id: 'p9', cat: 'Plant', q: "Responsible for synthesizing lipids in the plant cell?", o: ["Rough ER", "Smooth ER", "Chloroplast", "Golgi"], a: 1, f: "Smooth ER makes fats/oils.", img: "https://via.placeholder.com/400x200?text=Plant+Smooth+ER" },
+            { id: 'p10', cat: 'Plant', q: "Processes and ships proteins in a plant?", o: ["Ribosome", "Golgi Apparatus", "Nuclear Envelope", "Vesicle"], a: 1, f: "Golgi handles the shipping.", img: "https://via.placeholder.com/400x200?text=Plant+Golgi" },
+            { id: 'p11', cat: 'Plant', q: "Primary material of the plant cell wall?", o: ["Protein", "Chitin", "Cellulose", "Peptidoglycan"], a: 2, f: "Cellulose provides strength.", img: "https://via.placeholder.com/400x200?text=Cellulose" },
+            { id: 'p12', cat: 'Plant', q: "When a plant wilts, which organelle lost its water?", o: ["Cell Wall", "Nucleus", "Central Vacuole", "Chloroplast"], a: 2, f: "Central vacuole pressure keeps it upright.", img: "https://via.placeholder.com/400x200?text=Wilt" },
+
+            // --- BACTERIA CELLS (12) ---
+            { id: 'b1', cat: 'Bacteria', q: "Bacteria are unicellular. What does this mean?", o: ["No cells", "One cell", "Many cells", "Not alive"], a: 1, f: "Unicellular means one single cell.", img: "https://via.placeholder.com/400x200?text=Bacterium" },
+            { id: 'b2', cat: 'Bacteria', q: "Long, whip-like tail used for movement?", o: ["Cilia", "Pili", "Flagella", "Flagellum"], a: 3, f: "Flagellum rotates like a propeller.", img: "https://via.placeholder.com/400x200?text=Flagellum" },
+            { id: 'b3', cat: 'Bacteria', q: "Bacteria do NOT have this organelle?", o: ["Ribosome", "Cytoplasm", "Nucleus", "Cell Wall"], a: 2, f: "They lack a membrane-bound nucleus.", img: "https://via.placeholder.com/400x200?text=No+Nucleus" },
+            { id: 'b4', cat: 'Bacteria', q: "Where is DNA found in a bacterial cell?", o: ["Nucleus", "Nucleoid region", "Mitochondria", "Capsule"], a: 1, f: "DNA floats in the nucleoid area.", img: "https://via.placeholder.com/400x200?text=Nucleoid" },
+            { id: 'b5', cat: 'Bacteria', q: "Outermost sticky layer of some bacteria?", o: ["Cell Wall", "Plasma Membrane", "Capsule", "Cytoplasm"], a: 2, f: "Capsule helps in sticking and protection.", img: "https://via.placeholder.com/400x200?text=Capsule" },
+            { id: 'b6', cat: 'Bacteria', q: "Bacterial cell wall material?", o: ["Cellulose", "Chitin", "Peptidoglycan", "Lipid"], a: 2, f: "Peptidoglycan is unique to true bacteria.", img: "https://via.placeholder.com/400x200?text=Peptidoglycan" },
+            { id: 'b7', cat: 'Bacteria', q: "Small, hair-like structures for attachment?", o: ["Flagella", "Pili", "Cilia", "Vesicles"], a: 1, f: "Pili (pilus) help in attachment.", img: "https://via.placeholder.com/400x200?text=Pili" },
+            { id: 'b8', cat: 'Bacteria', q: "Small circular DNA loops?", o: ["Chromosomes", "Plasmids", "Nuclei", "Ribosomes"], a: 1, f: "Plasmids carry extra traits.", img: "https://via.placeholder.com/400x200?text=Plasmid" },
+            { id: 'b9', cat: 'Bacteria', q: "Responsible for protein synthesis in bacteria?", o: ["Nucleus", "Mitochondria", "Ribosome", "Chloroplast"], a: 2, f: "Ribosomes are found in all cells.", img: "https://via.placeholder.com/400x200?text=Bacterial+Ribosome" },
+            { id: 'b10', cat: 'Bacteria', q: "Bacteria fall into which category?", o: ["Eukaryotes", "Prokaryotes", "Multicellular", "Autotrophs"], a: 1, f: "Prokaryote means 'before nucleus'.", img: "https://via.placeholder.com/400x200?text=Prokaryote" },
+            { id: 'b11', cat: 'Bacteria', q: "Inside the cell wall, controls molecules?", o: ["Capsule", "Cytoplasm", "Plasma Membrane", "Nucleus"], a: 2, f: "Plasma membrane is universal.", img: "https://via.placeholder.com/400x200?text=Plasma+Membrane" },
+            { id: 'b12', cat: 'Bacteria', q: "How do most bacteria reproduce?", o: ["Meiosis", "Binary Fission", "Eggs", "Seeds"], a: 1, f: "Binary fission is simple cell division.", img: "https://via.placeholder.com/400x200?text=Binary+Fission" }
+        ];
+
+        // --- Global State ---
+        let currentUser = null;
+        let lastActivity = Date.now();
+        const SESSION_LIMIT = 10 * 60 * 1000; // 10 minutes
+
+        // --- Quiz State ---
+        let currentQuiz = [];
+        let qIdx = 0;
+        let score = 0;
+        let categoryScores = { Animal: 0, Plant: 0, Bacteria: 0 };
+
+        // --- UI Utilities ---
+        const ui = {
+            showScreen(id) {
+                ['auth', 'menu', 'quiz', 'leaderboard', 'results'].forEach(s => {
+                    document.getElementById(`screen-${s}`).classList.add('hidden');
+                });
+                document.getElementById(`screen-${id}`).classList.remove('hidden');
+                if (currentUser) document.getElementById('user-hud').classList.remove('hidden');
+                else document.getElementById('user-hud').classList.add('hidden');
+            },
+            updateUserHUD() {
+                if (!currentUser) return;
+                document.getElementById('user-name').textContent = currentUser.displayName;
+                document.getElementById('user-photo').src = currentUser.photoURL;
+            }
+        };
+
+        // --- Auth Manager ---
+        const authManager = {
+            async login() {
+                const provider = new GoogleAuthProvider();
+                try {
+                    await signInWithPopup(auth, provider);
+                } catch (e) {
+                    console.error("Login Error", e);
+                    alert("Login failed. Please check your config or popup settings.");
+                }
+            },
+            async logout() {
+                await signOut(auth);
+                ui.showScreen('auth');
+            }
+        };
+
+        // --- Session Manager ---
+        function checkSession() {
+            if (!currentUser) return;
+            if (Date.now() - lastActivity > SESSION_LIMIT) {
+                alert("Session expired. Logging out.");
+                authManager.logout();
+            }
+        }
+        setInterval(checkSession, 5000);
+        ['mousedown', 'keydown', 'scroll', 'touchstart'].forEach(e => {
+            window.addEventListener(e, () => { lastActivity = Date.now(); });
+        });
+
+        // --- Quiz Engine ---
+        window.quizEngine = {
+            start() {
+                currentQuiz = [...QUESTION_BANK].sort(() => 0.5 - Math.random());
+                qIdx = 0;
+                score = 0;
+                categoryScores = { Animal: 0, Plant: 0, Bacteria: 0 };
+                this.render();
+                ui.showScreen('quiz');
+            },
+            render() {
+                const q = currentQuiz[qIdx];
+                document.getElementById('quiz-idx').textContent = qIdx + 1;
+                document.getElementById('quiz-cat').textContent = `${q.cat.toUpperCase()}_CELL.v8`;
+                document.getElementById('quiz-img').src = q.img;
+                document.getElementById('quiz-q').textContent = q.q;
+                
+                const optionsBox = document.getElementById('quiz-options');
+                optionsBox.innerHTML = '';
+                document.getElementById('quiz-feedback').classList.add('hidden');
+
+                q.o.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = "flex items-center justify-between p-6 rounded-2xl border-2 border-slate-100 bg-white hover:border-emerald-300 hover:bg-emerald-50 transition-all font-bold text-left text-lg";
+                    btn.innerHTML = `<span>${opt}</span><div class="w-7 h-7 rounded-full border-2 border-slate-200"></div>`;
+                    btn.onclick = () => this.handleSelect(idx, btn);
+                    optionsBox.appendChild(btn);
+                });
+            },
+            handleSelect(idx, btn) {
+                const q = currentQuiz[qIdx];
+                const btns = document.getElementById('quiz-options').querySelectorAll('button');
+                btns.forEach(b => b.disabled = true);
+
+                const isCorrect = idx === q.a;
+                if (isCorrect) {
+                    btn.className = "flex items-center justify-between p-6 rounded-2xl border-2 border-emerald-600 bg-emerald-600 text-white font-black shadow-xl";
+                    btn.innerHTML = `<span>${q.o[idx]}</span><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
+                    score += 100;
+                    categoryScores[q.cat] += 100;
+                } else {
+                    btn.className = "flex items-center justify-between p-6 rounded-2xl border-2 border-red-600 bg-red-600 text-white font-black shadow-xl";
+                    btn.innerHTML = `<span>${q.o[idx]}</span><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>`;
+                    // Show correct one
+                    btns[q.a].className = "flex items-center justify-between p-6 rounded-2xl border-2 border-emerald-600 bg-emerald-50 text-emerald-600 font-black";
+                }
+
+                document.getElementById('feedback-text').textContent = q.f;
+                document.getElementById('feedback-box').className = `p-8 rounded-[2rem] border-2 ${isCorrect ? 'bg-emerald-50 border-emerald-100 text-emerald-900' : 'bg-red-50 border-red-100 text-red-900'}`;
+                document.getElementById('quiz-feedback').classList.remove('hidden');
+            },
+            next() {
+                qIdx++;
+                if (qIdx < currentQuiz.length) {
+                    this.render();
+                } else {
+                    this.finish();
+                }
+            },
+            async finish() {
+                document.getElementById('res-anml').textContent = categoryScores.Animal;
+                document.getElementById('res-plnt').textContent = categoryScores.Plant;
+                document.getElementById('res-bctr').textContent = categoryScores.Bacteria;
+                document.getElementById('res-total').textContent = score;
+                ui.showScreen('results');
+
+                // Save to Firebase
+                try {
+                    const resId = `${currentUser.uid}_${Date.now()}`;
+                    await setDoc(doc(db, "cells_quiz_results", resId), {
+                        uid: currentUser.uid,
+                        displayName: currentUser.displayName,
+                        photoURL: currentUser.photoURL,
+                        totalScore: score,
+                        categoryScores: categoryScores,
+                        lastPlayed: serverTimestamp()
+                    });
+
+                    // Update Top Ranking
+                    const rRef = doc(db, "rankings", currentUser.uid);
+                    const rSnap = await getDoc(rRef);
+                    if (!rSnap.exists() || score > rSnap.data().totalScore) {
+                        await setDoc(rRef, {
+                            displayName: currentUser.displayName,
+                            photoURL: currentUser.photoURL,
+                            totalScore: score,
+                            categoryScores: categoryScores,
+                            lastPlayed: serverTimestamp()
+                        }, { merge: true });
+                    }
+                } catch (e) {
+                    console.error("Save Error", e);
+                }
+            }
+        };
+
+        // --- Leaderboard ---
+        window.leaderboardEngine = {
+            async load() {
+                const body = document.getElementById('leaderboard-body');
+                body.innerHTML = '<tr><td colspan="5" class="p-12 text-center font-bold text-slate-400">Syncing with Mainframe...</td></tr>';
+                ui.showScreen('leaderboard');
+                
+                try {
+                    const q = query(collection(db, "rankings"), orderBy("totalScore", "desc"), limit(20));
+                    const snap = await getDocs(q);
+                    body.innerHTML = '';
+                    snap.forEach((doc, idx) => {
+                        const d = doc.data();
+                        const tr = document.createElement('tr');
+                        tr.className = "group hover:bg-emerald-50/30 transition-all";
+                        tr.innerHTML = `
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-base font-black w-8 ${idx < 3 ? 'text-emerald-500' : 'text-slate-200'}">${idx + 1}</span>
+                                    <img src="${d.photoURL}" class="w-10 h-10 rounded-xl" alt="avatar">
+                                    <span class="font-bold">${d.displayName}</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6 text-center text-slate-500 font-mono text-sm">${d.categoryScores.Animal}</td>
+                            <td class="px-8 py-6 text-center text-slate-500 font-mono text-sm">${d.categoryScores.Plant}</td>
+                            <td class="px-8 py-6 text-center text-slate-500 font-mono text-sm">${d.categoryScores.Bacteria}</td>
+                            <td class="px-8 py-6 text-right">
+                                <span class="px-4 py-1.5 bg-slate-900 text-white rounded-lg font-black text-sm">${d.totalScore}</span>
+                            </td>
+                        `;
+                        body.appendChild(tr);
+                    });
+                } catch (e) {
+                    body.innerHTML = '<tr><td colspan="5" class="p-12 text-center text-red-500">Failed to load rankings. Check security rules.</td></tr>';
+                }
+            }
+        };
+
+        // --- Initialization ---
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                ui.updateUserHUD();
+                ui.showScreen('menu');
+            } else {
+                ui.showScreen('auth');
+            }
+        });
+
+        document.getElementById('login-btn').onclick = () => authManager.login();
+
+    </script>
+</body>
+</html>
